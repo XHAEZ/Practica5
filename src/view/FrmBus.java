@@ -6,6 +6,7 @@
 package view;
 
 import controller.DAO.BusDao;
+import javax.swing.JOptionPane;
 import model.Bus;
 import view.modeloTabla.ModeloTablaDatos;
 
@@ -14,8 +15,10 @@ import view.modeloTabla.ModeloTablaDatos;
  * @author cobos
  */
 public class FrmBus extends javax.swing.JDialog {
+
     private BusDao bus = new BusDao();
     private ModeloTablaDatos modelo = new ModeloTablaDatos();
+
     /**
      * Creates new form FrmBus
      */
@@ -24,18 +27,74 @@ public class FrmBus extends javax.swing.JDialog {
         initComponents();
         cargarTabla();
     }
+
+    private void cargarTabla() {
+        modelo.setDatos(bus.mergeSort(bus.listar(), 0, 0));
+        tblTabla.setModel(modelo);
+        tblTabla.updateUI();
+    }
     
-    private void cargarTabla(){
+    private void cargarDato(){
         modelo.setDatos(bus.listar());
         tblTabla.setModel(modelo);
         tblTabla.updateUI();
     }
     
-    private void buscaBinaria(){
-        modelo.setDatos(bus.busquedaBinaria(bus.listar(), txtBusqueda.getText()));
-        tblTabla.setModel(modelo);
-        tblTabla.updateUI();
+    private void guardar(){
+        try {
+        bus.getBus().setNumeroBus(txtNumeroBus.getText());
+        bus.guardar();
+        cargarTabla();
+        } catch (Exception e) {
+        }
+        
     }
+
+    private void buscaBinaria() {
+        Integer eleccion = cbxAtributo.getSelectedIndex();
+            switch (eleccion) {
+            case 0:
+                modelo.setDatos(bus.ordenarNumero(txtBusqueda.getText()));
+            tblTabla.setModel(modelo);
+            tblTabla.updateUI();
+//            case 1:
+//                buscaBinariaAsiento();
+//            case 2:
+//                buscaBinariaConductor();
+            default:
+
+        }
+    }
+    
+//    private void buscaBinariaNumero(){
+//        try {
+//            modelo.setDatos(bus.ordenarNumero(txtBusqueda.getText()));
+//            tblTabla.setModel(modelo);
+//            tblTabla.updateUI();
+//        } catch (Exception e) {
+//            JOptionPane.showMessageDialog(null, "Introduzca de forma correcta el valor a buscar "+e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+//        }
+//    }
+    
+//    private void buscaBinariaAsiento(){
+//        try {
+//            modelo.setDatos(bus.busquedaBinariaNumeroAsiento(bus.listar(), txtBusqueda.getText()));
+//            tblTabla.setModel(modelo);
+//            tblTabla.updateUI();
+//        } catch (Exception e) {
+//            JOptionPane.showMessageDialog(null, "Introduzca de forma correcta el valor a buscar "+e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+//        }
+//    }
+//    
+//    private void buscaBinariaConductor(){
+//        try {
+//            modelo.setDatos(bus.busquedaBinariaConductor(bus.listar(), txtBusqueda.getText()));
+//            tblTabla.setModel(modelo);
+//            tblTabla.updateUI();
+//        } catch (Exception e) {
+//            JOptionPane.showMessageDialog(null, "Introduzca de forma correcta el valor a buscar "+e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+//        }
+//    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -51,6 +110,11 @@ public class FrmBus extends javax.swing.JDialog {
         jLabel1 = new javax.swing.JLabel();
         txtBusqueda = new javax.swing.JTextField();
         btnBuscar = new javax.swing.JButton();
+        cbxAtributo = new javax.swing.JComboBox<>();
+        jButton1 = new javax.swing.JButton();
+        txtNumeroBus = new javax.swing.JTextField();
+        jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -74,6 +138,29 @@ public class FrmBus extends javax.swing.JDialog {
             }
         });
 
+        cbxAtributo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Numero Bus", "Numero Asiento", "Nombre Conductor" }));
+
+        jButton1.setText("jButton1");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText("jButton2");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jButton3.setText("jButton3");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -81,25 +168,53 @@ public class FrmBus extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(txtBusqueda, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnBuscar)))
-                .addContainerGap(15, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jButton1)
+                            .addComponent(jButton2))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(txtBusqueda, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(btnBuscar))
+                                    .addComponent(txtNumeroBus, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(29, 29, 29)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jButton3)
+                                    .addComponent(cbxAtributo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(0, 44, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 19, Short.MAX_VALUE)
+                .addGap(0, 26, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtNumeroBus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton3))
+                .addGap(18, 18, 18)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtBusqueda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnBuscar))
-                .addGap(9, 9, 9)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtBusqueda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnBuscar)
+                            .addComponent(cbxAtributo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(9, 9, 9)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jButton2)
+                        .addGap(61, 61, 61)
+                        .addComponent(jButton1)
+                        .addGap(46, 46, 46))))
         );
 
         pack();
@@ -109,6 +224,28 @@ public class FrmBus extends javax.swing.JDialog {
         // TODO add your handling code here:
         buscaBinaria();
     }//GEN-LAST:event_btnBuscarActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        cargarDato();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        guardar();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        try {
+        int fila = tblTabla.getSelectedRow();
+        bus.modificar(fila);
+        cargarTabla();
+        } catch (Exception e) {
+        }
+        
+        
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -154,9 +291,14 @@ public class FrmBus extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBuscar;
+    private javax.swing.JComboBox<String> cbxAtributo;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tblTabla;
     private javax.swing.JTextField txtBusqueda;
+    private javax.swing.JTextField txtNumeroBus;
     // End of variables declaration//GEN-END:variables
 }

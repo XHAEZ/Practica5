@@ -33,7 +33,7 @@ public class ModeloTablaDatos extends AbstractTableModel{
 
     @Override
     public int getColumnCount() {
-      return 1;
+      return 2;
     }
 
     @Override
@@ -45,6 +45,8 @@ public class ModeloTablaDatos extends AbstractTableModel{
         }
         switch(arg1){
             case 0:
+                return (arg0+1);
+            case 1:
                 return b.getNumeroBus();
             default:
                 return null;
@@ -54,6 +56,7 @@ public class ModeloTablaDatos extends AbstractTableModel{
     @Override
     public String getColumnName(int column) {
         switch(column){
+            case 0: return "indice";
             case 1: return "Numero Bus";
             default: return null;
         }

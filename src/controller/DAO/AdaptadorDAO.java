@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
 
 /**
  *
- * @author alyce
+ * @author cobos
  */
 public class AdaptadorDAO<T> implements InterfazDAO<T> {
 

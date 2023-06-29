@@ -11,7 +11,7 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
  *
- * @author alyce
+ * @author cobos
  */
 public class Conexion {
     private XStream xstream;

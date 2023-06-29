@@ -12,7 +12,7 @@ import java.io.IOException;
 
 /**
  *
- * @author alyce
+ * @author cobos
  */
 public interface InterfazDAO <T>{
     /**

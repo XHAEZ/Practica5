@@ -12,12 +12,7 @@ package model;
 public class Pasajero {
     private String nombre;
     private String numeroAsiento;
-
-    public Pasajero(String nombre, String numeroAsiento) {
-        this.nombre = nombre;
-        this.numeroAsiento = numeroAsiento;
-    }
-
+    
     public String getNombre() {
         return nombre;
     }
