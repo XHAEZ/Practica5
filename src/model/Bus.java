@@ -16,7 +16,7 @@ public class Bus {
     private Integer id;
     private String numeroBus;
     private Conductor conductor;
-    private ListaEnlazada<Pasajero> pasajeros;
+    private Pasajero pasajero;
 
     public String getNumeroBus() {
         return numeroBus;
@@ -34,12 +34,12 @@ public class Bus {
         this.conductor = conductor;
     }
 
-    public ListaEnlazada<Pasajero> getPasajeros() {
-        return pasajeros;
+    public Pasajero getPasajero() {
+        return pasajero;
     }
 
-    public void setPasajeros(ListaEnlazada<Pasajero> pasajeros) {
-        this.pasajeros = pasajeros;
+    public void setPasajero(Pasajero pasajero) {
+        this.pasajero = pasajero;
     }
 
     public Integer getId() {

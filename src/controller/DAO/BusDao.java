@@ -47,10 +47,22 @@ public class BusDao extends AdaptadorDAO<Bus> {
         return listar().size() + 1;
     }
 
-    public ListaEnlazada<Bus> ordenarNumero(String dato) {
+    public ListaEnlazada<Bus> buscarNumeroBus(String dato) {
         ListaEnlazada<Bus> lista = listar();
         mergeSort(lista, 0, 0);
-        return busquedaBinaria(lista, dato);
+        return busquedaBinariaNumeroBus(lista, dato);
+    }
+    
+     public ListaEnlazada<Bus> buscarNumeroAsiento(String dato) {
+        ListaEnlazada<Bus> lista = listar();
+        mergeSort(lista, 0, 0);
+        return busquedaBinariaNumeroAsiento(lista, dato);
+    }
+     
+      public ListaEnlazada<Bus> buscarNombreConductor(String dato) {
+        ListaEnlazada<Bus> lista = listar();
+        mergeSort(lista, 0, 0);
+        return busquedaBinariaConductor(lista, dato);
     }
 
     public ListaEnlazada<Bus> busquedaSecuencial(ListaEnlazada<Bus> lista, String numeroBus) {
@@ -72,62 +84,8 @@ public class BusDao extends AdaptadorDAO<Bus> {
             return null; // No se encontró ningún bus, se devuelve null
         }
     }
-
-//    public ListaEnlazada<Bus> busquedaBinariaNumeroAsiento(ListaEnlazada<Bus> lista, String numeroAsiento) {
-//        Bus[] arreglo = lista.toArray(); // Convierte la lista enlazada a un arreglo de objetos Bus
-//      
-//
-//        int inicio = 0;
-//        int fin = arreglo.length - 1;
-//
-//        while (inicio <= fin) {
-//            int medio = (inicio + fin) / 2; // Calcula el índice medio del arreglo
-//
-//            Bus aux = arreglo[medio]; // Obtiene el objeto Bus en el índice medio
-//            String numeroBusAux = aux.getNumeroBus(); // Obtiene el número de bus del objeto Bus
-//
-//            if (numeroBusAux.equals(numeroAsiento)) {
-//                ListaEnlazada<Bus> resultado = new ListaEnlazada<>(); // Crea una nueva lista enlazada para almacenar los resultados
-//                resultado.insertar(aux); // Agrega el objeto Bus encontrado a la lista
-//                return resultado; // Devuelve la lista enlazada con el objeto Bus encontrado
-//            } else if (numeroBusAux.equals(numeroAsiento)) {
-//                inicio = medio + 1; // El número de bus buscado es mayor, se ajusta el inicio para buscar en la mitad derecha del arreglo
-//            } else {
-//                fin = medio - 1; // El número de bus buscado es menor, se ajusta el fin para buscar en la mitad izquierda del arreglo
-//            }
-//        }
-//
-//        return lista; // No se encontró el bus, se devuelve null
-//    }
-//
-//    public ListaEnlazada<Bus> busquedaBinariaNumero(ListaEnlazada<Bus> lista, String numeroBus) {
-//        Bus[] arreglo = lista.toArray(); // Convierte la lista enlazada a un arreglo de objetos Bus
-//
-//        int inicio = 0;
-//        int fin = arreglo.length - 1;
-//
-//        ListaEnlazada<Bus> resultado = new ListaEnlazada<>(); // Crea una nueva lista enlazada para almacenar los resultados
-//        while (inicio <= fin) {
-//            int medio = (inicio + fin) / 2; // Calcula el índice medio del arreglo
-//
-//            Bus aux = arreglo[medio]; // Obtiene el objeto Bus en el índice medio
-//            String numeroBusAux = aux.getNumeroBus().toLowerCase(); // Obtiene el número de bus del objeto Bus
-//
-//            if (numeroBusAux.equalsIgnoreCase(numeroBus)) {
-//                resultado.insertar(aux); // Agrega el objeto Bus encontrado a la lista
-//                return resultado;
-//            }
-//            if (numeroBusAux.compareToIgnoreCase(numeroBus) <= 0) {
-//                inicio = medio + 1; // El número de bus buscado es mayor, se ajusta el inicio para buscar en la mitad derecha del arreglo
-//            } else {
-//                fin = medio - 1; // El número de bus buscado es menor, se ajusta el fin para buscar en la mitad izquierda del arreglo
-//            }
-//        }
-//
-//        return null; // No se encontró el bus, se devuelve null
-//    }
-    
-    public ListaEnlazada<Bus> busquedaBinaria(ListaEnlazada<Bus> arreglo, String elemento) {
+  
+    public ListaEnlazada<Bus> busquedaBinariaNumeroBus(ListaEnlazada<Bus> arreglo, String elemento) {
     Bus[] lista = arreglo.toArray();
     int inicio = 0;
     int fin = lista.length - 1;
@@ -156,32 +114,64 @@ public class BusDao extends AdaptadorDAO<Bus> {
     return arreglo;
 }
 
+   public ListaEnlazada<Bus> busquedaBinariaConductor(ListaEnlazada<Bus> arreglo, String elemento) {
+    Bus[] lista = arreglo.toArray();
+    int inicio = 0;
+    int fin = lista.length - 1;
 
-    public ListaEnlazada<Bus> busquedaBinariaConductor(ListaEnlazada<Bus> lista, String nombreConductor) {
-        Bus[] arreglo = lista.toArray(); // Convierte la lista enlazada a un arreglo de objetos Bus
+    while (inicio <= fin) {
+        int medio = inicio + (fin - inicio) / 2;
 
-        int inicio = 0;
-        int fin = arreglo.length - 1;
-
-        while (inicio <= fin) {
-            int medio = (inicio + fin) / 2; // Calcula el índice medio del arreglo
-
-            Bus aux = arreglo[medio]; // Obtiene el objeto Bus en el índice medio
-            String numeroBusAux = aux.getNumeroBus(); // Obtiene el número de bus del objeto Bus
-
-            if (numeroBusAux.equals(nombreConductor)) {
-                ListaEnlazada<Bus> resultado = new ListaEnlazada<>(); // Crea una nueva lista enlazada para almacenar los resultados
-                resultado.insertar(aux); // Agrega el objeto Bus encontrado a la lista
-                return resultado; // Devuelve la lista enlazada con el objeto Bus encontrado
-            } else if (numeroBusAux.compareTo(nombreConductor) < 0) {
-                inicio = medio + 1; // El número de bus buscado es mayor, se ajusta el inicio para buscar en la mitad derecha del arreglo
-            } else {
-                fin = medio - 1; // El número de bus buscado es menor, se ajusta el fin para buscar en la mitad izquierda del arreglo
-            }
+        // Si el elemento está en el medio, se encontró
+        if (lista[medio].getConductor().getNombre().equals(elemento)) {
+            ListaEnlazada<Bus> resultado = new ListaEnlazada<>();
+            resultado.insertar(lista[medio]);
+            return resultado;
         }
 
-        return lista; // No se encontró el bus, se devuelve null
+        // Si el elemento es mayor, se descarta la mitad izquierda del arreglo
+        if (lista[medio].getConductor().getNombre().compareTo(elemento) < 0) {
+            inicio = medio + 1;
+        }
+        // Si el elemento es menor, se descarta la mitad derecha del arreglo
+        else {
+            fin = medio - 1;
+        }
     }
+
+    // Si el elemento no se encuentra, se retorna una lista vacía
+    return arreglo;
+}
+   
+   public ListaEnlazada<Bus> busquedaBinariaNumeroAsiento(ListaEnlazada<Bus> arreglo, String elemento) {
+    Bus[] lista = arreglo.toArray();
+    int inicio = 0;
+    int fin = lista.length - 1;
+
+    while (inicio <= fin) {
+        int medio = inicio + (fin - inicio) / 2;
+
+        // Si el elemento está en el medio, se encontró
+        if (lista[medio].getPasajero().getNumeroAsiento().equals(elemento)) {
+            ListaEnlazada<Bus> resultado = new ListaEnlazada<>();
+            resultado.insertar(lista[medio]);
+            return resultado;
+        }
+
+        // Si el elemento es mayor, se descarta la mitad izquierda del arreglo
+        if (lista[medio].getPasajero().getNumeroAsiento().compareTo(elemento) < 0) {
+            inicio = medio + 1;
+        }
+        // Si el elemento es menor, se descarta la mitad derecha del arreglo
+        else {
+            fin = medio - 1;
+        }
+    }
+
+    // Si el elemento no se encuentra, se retorna una lista vacía
+    return arreglo;
+}
+   
     
     public ListaEnlazada<Bus> mergeSort(ListaEnlazada<Bus> cuenta, Integer tipoOrden, Integer atributoOrden) {
         // Comprueba si la lista está vacía o solo contiene un elemento, en cuyo caso ya está ordenada
