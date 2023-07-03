@@ -7,8 +7,7 @@ package view;
 
 import controller.DAO.BusDao;
 import javax.swing.JOptionPane;
-import model.Bus;
-import view.modeloTabla.ModeloTablaDatos;
+import view.modeloTabla.ModeloTablaBus;
 
 /**
  *
@@ -17,7 +16,8 @@ import view.modeloTabla.ModeloTablaDatos;
 public class FrmBus extends javax.swing.JDialog {
 
     private BusDao bus = new BusDao();
-    private ModeloTablaDatos modelo = new ModeloTablaDatos();
+    private ModeloTablaBus modelo = new ModeloTablaBus();
+    private Integer fila = -1;
 
     /**
      * Creates new form FrmBus
@@ -26,6 +26,9 @@ public class FrmBus extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         cargarTabla();
+        setResizable(false);
+        setLocationRelativeTo(this);
+        elegirBusqueda();
     }
 
     private void cargarTabla() {
@@ -33,72 +36,100 @@ public class FrmBus extends javax.swing.JDialog {
         tblTabla.setModel(modelo);
         tblTabla.updateUI();
     }
-    
-    private void cargarDato(){
-        modelo.setDatos(bus.listar());
+
+    private void limpiar() {
+        txtNumeroBus.setText("");
+        txtRuta.setText("");
+        cargarTabla();
+    }
+
+    private void guardar() {
+        try {
+            if (txtNumeroBus.getText().trim().isEmpty() || txtRuta.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Ingrese todos los datos por favor", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                bus.getBus().setNumeroBus(txtNumeroBus.getText());
+                bus.getBus().setRuta(txtRuta.getText());
+                bus.guardar();
+                limpiar();
+                JOptionPane.showMessageDialog(null, "Datos Guardados Correctamente", "Informacion", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage() + " Error", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+    }
+
+    private void elegirBusqueda() {
+        int eleccion = cbxBusqueda.getSelectedIndex();
+        if (eleccion == 0) {
+            btnBuscarNumero.setVisible(true);
+            btnBuscarRuta.setVisible(true);
+            btnSecuencial.setVisible(false);
+            btnSecuencialR.setVisible(false);
+        } else if (eleccion == 1) {
+            btnSecuencial.setVisible(true);
+            btnSecuencialR.setVisible(true);
+            btnBuscarNumero.setVisible(false);
+            btnBuscarRuta.setVisible(false);
+        }    
+    }
+
+    private void buscarNumero() {
+        modelo.setDatos(bus.buscarNumeroBus(txtBusqueda.getText()));
+        tblTabla.setModel(modelo);
+        tblTabla.updateUI();
+    }
+
+    private void buscarRuta() {
+        modelo.setDatos(bus.buscarRuta(txtBusqueda.getText()));
         tblTabla.setModel(modelo);
         tblTabla.updateUI();
     }
     
-    private void guardar(){
-        try {
-        bus.getBus().setNumeroBus(txtNumeroBus.getText());
-        bus.guardar();
-        cargarTabla();
-        } catch (Exception e) {
-        }
-        
+    private void buscarNumeroSB() {
+        modelo.setDatos(bus.buscarNumeroBusC(txtBusqueda.getText()));
+        tblTabla.setModel(modelo);
+        tblTabla.updateUI();
     }
 
-    private void buscaBinaria() {
-        Integer eleccion = cbxAtributo.getSelectedIndex();
-            switch (eleccion) {
-            case 0:
-                modelo.setDatos(bus.buscarNumeroBus(txtBusqueda.getText()));
-                tblTabla.setModel(modelo);
-                tblTabla.updateUI();
-            case 1:
-                modelo.setDatos(bus.buscarNumeroAsiento(txtBusqueda.getText()));
-                tblTabla.setModel(modelo);
-                tblTabla.updateUI();
-            case 2:
-                modelo.setDatos(bus.buscarNombreConductor(txtBusqueda.getText()));
-                tblTabla.setModel(modelo);
-                tblTabla.updateUI();
-            default:
+    private void buscarRutaSB() {
+        modelo.setDatos(bus.buscarRutaC(txtBusqueda.getText()));
+        tblTabla.setModel(modelo);
+        tblTabla.updateUI();
+    }
 
+    private void ingresarNuevoPasajero() {
+        fila = tblTabla.getSelectedRow();
+        if (fila >= 0) {
+            try {
+                bus.setBus(modelo.getDatos().get(fila));
+                new FrmPasajero(null, true, bus).setVisible(true);
+                bus.modificar(fila);
+                limpiar();
+            } catch (Exception e) {
+
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Selecciona un bus primero", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
-//    private void buscaBinariaNumero(){
-//        try {
-//            modelo.setDatos(bus.ordenarNumero(txtBusqueda.getText()));
-//            tblTabla.setModel(modelo);
-//            tblTabla.updateUI();
-//        } catch (Exception e) {
-//            JOptionPane.showMessageDialog(null, "Introduzca de forma correcta el valor a buscar "+e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-//        }
-//    }
-    
-//    private void buscaBinariaAsiento(){
-//        try {
-//            modelo.setDatos(bus.busquedaBinariaNumeroAsiento(bus.listar(), txtBusqueda.getText()));
-//            tblTabla.setModel(modelo);
-//            tblTabla.updateUI();
-//        } catch (Exception e) {
-//            JOptionPane.showMessageDialog(null, "Introduzca de forma correcta el valor a buscar "+e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-//        }
-//    }
-//    
-//    private void buscaBinariaConductor(){
-//        try {
-//            modelo.setDatos(bus.busquedaBinariaConductor(bus.listar(), txtBusqueda.getText()));
-//            tblTabla.setModel(modelo);
-//            tblTabla.updateUI();
-//        } catch (Exception e) {
-//            JOptionPane.showMessageDialog(null, "Introduzca de forma correcta el valor a buscar "+e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-//        }
-//    }
+
+    private void ingresarNuevoConductor() {
+        fila = tblTabla.getSelectedRow();
+        if (fila >= 0) {
+            try {
+                bus.setBus(modelo.getDatos().get(fila));
+                new FrmConductor(null, true, bus).setVisible(true);
+                bus.modificar(fila);
+                limpiar();
+            } catch (Exception e) {
+
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Selecciona un bus primero", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -109,15 +140,96 @@ public class FrmBus extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        txtNumeroBus = new javax.swing.JTextField();
+        btnRegistrar = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        txtRuta = new javax.swing.JTextField();
+        jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblTabla = new javax.swing.JTable();
-        jLabel1 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
         txtBusqueda = new javax.swing.JTextField();
-        btnBuscar = new javax.swing.JButton();
-        cbxAtributo = new javax.swing.JComboBox<>();
-        txtNumeroBus = new javax.swing.JTextField();
+        btnBuscarRuta = new javax.swing.JButton();
+        btnBuscarNumero = new javax.swing.JButton();
+        cbxBusqueda = new javax.swing.JComboBox<>();
+        btnSecuencial = new javax.swing.JButton();
+        btnSecuencialR = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Informacion Bus", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION));
+
+        jLabel1.setText("Numero Bus");
+
+        btnRegistrar.setText("Registrar");
+        btnRegistrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegistrarActionPerformed(evt);
+            }
+        });
+
+        jLabel2.setText("Ruta");
+
+        jButton2.setText("Ingresar Conductor");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jButton3.setText("Ingresar Pasajero");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(btnRegistrar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtNumeroBus, javax.swing.GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE)
+                            .addComponent(txtRuta))))
+                .addGap(28, 28, 28))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(txtNumeroBus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(txtRuta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnRegistrar)
+                    .addComponent(jButton2)
+                    .addComponent(jButton3)))
+        );
+
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Tabla Bus", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION));
 
         tblTabla.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -132,14 +244,98 @@ public class FrmBus extends javax.swing.JDialog {
         ));
         jScrollPane1.setViewportView(tblTabla);
 
-        btnBuscar.setText("Buscar");
-        btnBuscar.addActionListener(new java.awt.event.ActionListener() {
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Opciones Busqueda", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION));
+        jPanel2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+
+        jLabel3.setText("Dato a buscar: ");
+
+        txtBusqueda.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBuscarActionPerformed(evt);
+                txtBusquedaActionPerformed(evt);
             }
         });
 
-        cbxAtributo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Numero Bus", "Numero Asiento", "Nombre Conductor" }));
+        btnBuscarRuta.setText("Buscar Ruta");
+        btnBuscarRuta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarRutaActionPerformed(evt);
+            }
+        });
+
+        btnBuscarNumero.setText("Buscar Numero Bus");
+        btnBuscarNumero.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarNumeroActionPerformed(evt);
+            }
+        });
+
+        cbxBusqueda.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Binaria", "Secuencial Binaria" }));
+
+        btnSecuencial.setText("Buscar Numero Bus SB");
+
+        btnSecuencialR.setText("Buscar Ruta");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(36, 36, 36)
+                        .addComponent(txtBusqueda, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(btnBuscarNumero)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(btnSecuencial, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
+                                .addGap(18, 18, 18)))
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnBuscarRuta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnSecuencialR, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(cbxBusqueda, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(txtBusqueda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbxBusqueda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnBuscarRuta)
+                    .addComponent(btnBuscarNumero))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSecuencial)
+                    .addComponent(btnSecuencialR))
+                .addContainerGap())
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -148,48 +344,54 @@ public class FrmBus extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(77, 77, 77)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(txtBusqueda, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(btnBuscar))
-                                    .addComponent(txtNumeroBus, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(29, 29, 29)
-                                .addComponent(cbxAtributo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 44, Short.MAX_VALUE)))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 28, Short.MAX_VALUE)
-                .addComponent(txtNumeroBus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel1)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtBusqueda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnBuscar)
-                    .addComponent(cbxAtributo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(9, 9, 9)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
+    private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
         // TODO add your handling code here:
-        buscaBinaria();
-    }//GEN-LAST:event_btnBuscarActionPerformed
+        guardar();
+    }//GEN-LAST:event_btnRegistrarActionPerformed
+
+    private void txtBusquedaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBusquedaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtBusquedaActionPerformed
+
+    private void btnBuscarRutaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarRutaActionPerformed
+        // TODO add your handling code here:
+        buscarRuta();
+    }//GEN-LAST:event_btnBuscarRutaActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        ingresarNuevoPasajero();
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        ingresarNuevoConductor();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void btnBuscarNumeroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarNumeroActionPerformed
+        // TODO add your handling code here:
+        buscarNumero();
+    }//GEN-LAST:event_btnBuscarNumeroActionPerformed
 
     /**
      * @param args the command line arguments
@@ -234,12 +436,24 @@ public class FrmBus extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnBuscar;
-    private javax.swing.JComboBox<String> cbxAtributo;
+    private javax.swing.JButton btnBuscarNumero;
+    private javax.swing.JButton btnBuscarRuta;
+    private javax.swing.JButton btnRegistrar;
+    private javax.swing.JButton btnSecuencial;
+    private javax.swing.JButton btnSecuencialR;
+    private javax.swing.JComboBox<String> cbxBusqueda;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tblTabla;
     private javax.swing.JTextField txtBusqueda;
     private javax.swing.JTextField txtNumeroBus;
+    private javax.swing.JTextField txtRuta;
     // End of variables declaration//GEN-END:variables
 }

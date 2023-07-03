@@ -1,4 +1,4 @@
-/*
+    /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -9,6 +9,7 @@ import controller.ed.lista.ListaEnlazada;
 import controller.ed.lista.exception.EmptyException;
 import controller.ed.lista.exception.PositionException;
 import java.io.IOException;
+import model.Bus;
 import model.Bus;
 
 /**
@@ -53,27 +54,33 @@ public class BusDao extends AdaptadorDAO<Bus> {
         return busquedaBinariaNumeroBus(lista, dato);
     }
     
-     public ListaEnlazada<Bus> buscarNumeroAsiento(String dato) {
+    public ListaEnlazada<Bus> buscarRuta(String dato) {
         ListaEnlazada<Bus> lista = listar();
-        mergeSort(lista, 0, 0);
-        return busquedaBinariaNumeroAsiento(lista, dato);
+        mergeSort(lista, 0, 1);
+        return busquedaBinariaRuta(lista, dato);
     }
-     
-      public ListaEnlazada<Bus> buscarNombreConductor(String dato) {
+    
+    public ListaEnlazada<Bus> buscarNumeroBusC(String dato) {
         ListaEnlazada<Bus> lista = listar();
         mergeSort(lista, 0, 0);
-        return busquedaBinariaConductor(lista, dato);
+        return numeroBinarioSecuencial(lista, dato);
+    }
+    
+     public ListaEnlazada<Bus> buscarRutaC(String dato) {
+        ListaEnlazada<Bus> lista = listar();
+        mergeSort(lista, 0, 1);
+        return rutaBinarioSecuencial(lista, dato);
     }
 
-    public ListaEnlazada<Bus> busquedaSecuencial(ListaEnlazada<Bus> lista, String numeroBus) {
+    public ListaEnlazada<Bus> busquedaSecuencialNumero(ListaEnlazada<Bus> lista, String nombreBus) {
         Bus[] arreglo = lista.toArray(); // Convierte la lista enlazada a un arreglo de objetos Bus
 
         ListaEnlazada<Bus> resultado = new ListaEnlazada<>(); // Crea una nueva lista enlazada para almacenar los resultados
 
         for (Bus bus : arreglo) {
-            String numeroBusAux = bus.getNumeroBus(); // Obtiene el número de bus del objeto Bus
+            String nombreBusAux = bus.getRuta(); // Obtiene el nombre de pasajero del objeto Bus
 
-            if (numeroBusAux.equals(numeroBus)) {
+            if (nombreBusAux.equals(nombreBus)) {
                 resultado.insertar(bus); // Agrega el objeto Bus encontrado a la lista
             }
         }
@@ -81,7 +88,52 @@ public class BusDao extends AdaptadorDAO<Bus> {
         if (!resultado.estaVacia()) {
             return resultado; // Devuelve la lista enlazada con los objetos Bus encontrados
         } else {
-            return null; // No se encontró ningún bus, se devuelve null
+            return null; // No se encontró ningún pasajero, se devuelve null
+        }
+    } 
+    
+    public ListaEnlazada<Bus> busquedaSecuencialRuta(ListaEnlazada<Bus> lista, String rutaBus) {
+        Bus[] arreglo = lista.toArray(); // Convierte la lista enlazada a un arreglo de objetos Bus
+
+        ListaEnlazada<Bus> resultado = new ListaEnlazada<>(); // Crea una nueva lista enlazada para almacenar los resultados
+
+        for (Bus bus : arreglo) {
+            String rutaBusAux = bus.getNumeroBus(); // Obtiene la ruta de pasajero del objeto Bus
+
+            if (rutaBusAux.equals(rutaBus)) {
+                resultado.insertar(bus); // Agrega el objeto Bus encontrado a la lista
+            }
+        }
+        if (!resultado.estaVacia()) {
+            return resultado; // Devuelve la lista enlazada con los objetos Bus encontrados
+        } else {
+            return null; // No se encontró ningún pasajero, se devuelve null
+        }
+    } 
+    
+    public ListaEnlazada<Bus> numeroBinarioSecuencial(ListaEnlazada<Bus> lista, String objetivo) {
+        // Realizar la búsqueda binaria inicialmente
+       ListaEnlazada<Bus> resultadoBinario = buscarNumeroBus(objetivo);
+
+        if (resultadoBinario.size() == -1) {
+            // Si el elemento no se encuentra, realizar la búsqueda secuencial
+            return busquedaSecuencialNumero(lista, objetivo);
+        } else {
+            // Si se encuentra mediante búsqueda binaria, devolver el resultado
+            return resultadoBinario;
+        }
+    }
+    
+    public ListaEnlazada<Bus> rutaBinarioSecuencial(ListaEnlazada<Bus> lista, String objetivo) {
+        // Realizar la búsqueda binaria inicialmente
+       ListaEnlazada<Bus> resultadoBinario = buscarRuta(objetivo);
+
+        if (resultadoBinario.size() == -1) {
+            // Si el elemento no se encuentra, realizar la búsqueda secuencial
+            return busquedaSecuencialRuta(lista, objetivo);
+        } else {
+            // Si se encuentra mediante búsqueda binaria, devolver el resultado
+            return resultadoBinario;
         }
     }
   
@@ -113,8 +165,8 @@ public class BusDao extends AdaptadorDAO<Bus> {
     // Si el elemento no se encuentra, se retorna una lista vacía
     return arreglo;
 }
-
-   public ListaEnlazada<Bus> busquedaBinariaConductor(ListaEnlazada<Bus> arreglo, String elemento) {
+    
+    public ListaEnlazada<Bus> busquedaBinariaRuta(ListaEnlazada<Bus> arreglo, String elemento) {
     Bus[] lista = arreglo.toArray();
     int inicio = 0;
     int fin = lista.length - 1;
@@ -123,14 +175,14 @@ public class BusDao extends AdaptadorDAO<Bus> {
         int medio = inicio + (fin - inicio) / 2;
 
         // Si el elemento está en el medio, se encontró
-        if (lista[medio].getConductor().getNombre().equals(elemento)) {
+        if (lista[medio].getRuta().equals(elemento)) {
             ListaEnlazada<Bus> resultado = new ListaEnlazada<>();
             resultado.insertar(lista[medio]);
             return resultado;
         }
 
         // Si el elemento es mayor, se descarta la mitad izquierda del arreglo
-        if (lista[medio].getConductor().getNombre().compareTo(elemento) < 0) {
+        if (lista[medio].getRuta().compareTo(elemento) < 0) {
             inicio = medio + 1;
         }
         // Si el elemento es menor, se descarta la mitad derecha del arreglo
@@ -142,36 +194,6 @@ public class BusDao extends AdaptadorDAO<Bus> {
     // Si el elemento no se encuentra, se retorna una lista vacía
     return arreglo;
 }
-   
-   public ListaEnlazada<Bus> busquedaBinariaNumeroAsiento(ListaEnlazada<Bus> arreglo, String elemento) {
-    Bus[] lista = arreglo.toArray();
-    int inicio = 0;
-    int fin = lista.length - 1;
-
-    while (inicio <= fin) {
-        int medio = inicio + (fin - inicio) / 2;
-
-        // Si el elemento está en el medio, se encontró
-        if (lista[medio].getPasajero().getNumeroAsiento().equals(elemento)) {
-            ListaEnlazada<Bus> resultado = new ListaEnlazada<>();
-            resultado.insertar(lista[medio]);
-            return resultado;
-        }
-
-        // Si el elemento es mayor, se descarta la mitad izquierda del arreglo
-        if (lista[medio].getPasajero().getNumeroAsiento().compareTo(elemento) < 0) {
-            inicio = medio + 1;
-        }
-        // Si el elemento es menor, se descarta la mitad derecha del arreglo
-        else {
-            fin = medio - 1;
-        }
-    }
-
-    // Si el elemento no se encuentra, se retorna una lista vacía
-    return arreglo;
-}
-   
     
     public ListaEnlazada<Bus> mergeSort(ListaEnlazada<Bus> cuenta, Integer tipoOrden, Integer atributoOrden) {
         // Comprueba si la lista está vacía o solo contiene un elemento, en cuyo caso ya está ordenada
@@ -239,6 +261,20 @@ public class BusDao extends AdaptadorDAO<Bus> {
                     }
                     indiceArreglo++;
                 }
+            case 1:    
+             // Combinación de las dos mitades en orden
+                while (indiceIzquierda < leftSize && indiceDerecha < rightSize) {
+                    if (tipoOrden == 0) { // Orden ascendente
+                        if (arregloIzquierda[indiceIzquierda].getRuta().compareTo(arregloDerecha[indiceDerecha].getRuta()) < 0) {
+                            arreglo[indiceArreglo] = arregloIzquierda[indiceIzquierda];
+                            indiceIzquierda++;
+                        } else {
+                            arreglo[indiceArreglo] = arregloDerecha[indiceDerecha];
+                            indiceDerecha++;
+                        }
+                    }
+                    indiceArreglo++;
+                }
            
             default:
         }
@@ -257,19 +293,5 @@ public class BusDao extends AdaptadorDAO<Bus> {
             indiceArreglo++;
         }
     }
-
-//    public ListaEnlazada<Bus> busquedaCombinada(ListaEnlazada<Bus> lista, String objetivo) {
-//   
-//        // Realizar la búsqueda binaria inicialmente
-//       ListaEnlazada<Bus> resultadoBinario = busquedaBinaria(lista, objetivo);
-//
-//        if (resultadoBinario.size() == -1) {
-//            // Si el elemento no se encuentra, realizar la búsqueda secuencial
-//            return busquedaSecuencial(lista, objetivo);
-//        } else {
-//            // Si se encuentra mediante búsqueda binaria, devolver el resultado
-//            return resultadoBinario;
-//        }
-//    }
 
 }

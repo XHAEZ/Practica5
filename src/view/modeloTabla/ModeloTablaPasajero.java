@@ -8,21 +8,20 @@ package view.modeloTabla;
 import controller.ed.lista.ListaEnlazada;
 import javax.swing.table.AbstractTableModel;
 import model.Bus;
-
+import model.Pasajero;
 
 /**
  *
  * @author cobos
  */
-public class ModeloTablaDatos extends AbstractTableModel{
-    
-    private ListaEnlazada<Bus> datos = new ListaEnlazada<>();
+public class ModeloTablaPasajero extends AbstractTableModel{
+    private ListaEnlazada<Pasajero> datos = new ListaEnlazada<>();
 
-    public ListaEnlazada<Bus> getDatos() {
+    public ListaEnlazada<Pasajero> getDatos() {
         return datos;
     }
 
-    public void setDatos(ListaEnlazada<Bus> datos) {
+    public void setDatos(ListaEnlazada<Pasajero> datos) {
         this.datos = datos;
     }
     
@@ -33,21 +32,20 @@ public class ModeloTablaDatos extends AbstractTableModel{
 
     @Override
     public int getColumnCount() {
-      return 2;
+      return 3;
     }
 
     @Override
     public Object getValueAt(int arg0, int arg1) {
-       Bus b = null;
+       Pasajero p = null;
         try {
-            b = datos.get(arg0);
+            p = datos.get(arg0);
         } catch (Exception e) {
         }
         switch(arg1){
-            case 0:
-                return (arg0+1);
-            case 1:
-                return b.getNumeroBus();
+            case 0: return (arg0+1);
+            case 1: return p.getNombre();
+            case 2: return p.getNumeroAsiento();
             default:
                 return null;
         }
@@ -56,13 +54,10 @@ public class ModeloTablaDatos extends AbstractTableModel{
     @Override
     public String getColumnName(int column) {
         switch(column){
-            case 0: return "indice";
-            case 1: return "Numero Bus";
+            case 0: return "ID";
+            case 1: return "Nombre Pasajero";
+            case 2: return "Numero Asiento";
             default: return null;
         }
     }
-    
-    
 }
-
-

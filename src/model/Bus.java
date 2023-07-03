@@ -15,8 +15,9 @@ public class Bus {
 
     private Integer id;
     private String numeroBus;
-    private Conductor conductor;
-    private Pasajero pasajero;
+    private String ruta;
+    private ListaEnlazada<Conductor> conductor = new ListaEnlazada<>();
+    private ListaEnlazada<Pasajero> pasajero = new ListaEnlazada<>();
 
     public String getNumeroBus() {
         return numeroBus;
@@ -24,22 +25,6 @@ public class Bus {
 
     public void setNumeroBus(String numeroBus) {
         this.numeroBus = numeroBus;
-    }
-
-    public Conductor getConductor() {
-        return conductor;
-    }
-
-    public void setConductor(Conductor conductor) {
-        this.conductor = conductor;
-    }
-
-    public Pasajero getPasajero() {
-        return pasajero;
-    }
-
-    public void setPasajero(Pasajero pasajero) {
-        this.pasajero = pasajero;
     }
 
     public Integer getId() {
@@ -50,9 +35,28 @@ public class Bus {
         this.id = id;
     }
 
-    @Override
-    public String toString() {
-        return numeroBus;
+    public ListaEnlazada<Conductor> getConductor() {
+        return conductor;
+    }
+
+    public void setConductor(ListaEnlazada<Conductor> conductor) {
+        this.conductor = conductor;
+    }
+
+    public ListaEnlazada<Pasajero> getPasajero() {
+        return pasajero;
+    }
+
+    public void setPasajero(ListaEnlazada<Pasajero> pasajero) {
+        this.pasajero = pasajero;
+    }
+
+    public String getRuta() {
+        return ruta;
+    }
+
+    public void setRuta(String ruta) {
+        this.ruta = ruta;
     }
 
 }
